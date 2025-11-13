@@ -1,0 +1,67 @@
+.currentMembers {
+  margin-bottom: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--default-border-color);
+}
+
+.subtitle {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--secondary-text-color);
+  margin-bottom: 8px;
+}
+
+.searchInput {
+  margin-bottom: 12px;
+}
+
+.users {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.userItem {
+  display: flex;
+  align-items: center;
+  padding: 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: var(--hover-background-color);
+  }
+}
+
+.userName {
+  margin-left: 8px;
+  font-weight: 500;
+  flex: 1;
+}
+
+.userEmail {
+  margin-left: 4px;
+  font-size: 12px;
+  color: var(--secondary-text-color);
+}
+
+.removeButton {
+  margin-left: auto !important;
+}
+
+.roleSelection {
+  margin-top: 16px;
+  padding: 12px;
+  background-color: var(--background-light-color);
+  border-radius: 4px;
+}
+
+.selectedUser {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+  padding: 8px;
+  background-color: white;
+  border-radius: 4px;
+}
