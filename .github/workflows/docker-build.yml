@@ -24,4 +24,3 @@ jobs:
           context: .
           push: true
           tags: ghcr.io/matrixisused/planka:latest
-
