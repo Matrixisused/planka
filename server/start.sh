@@ -33,6 +33,7 @@ load_secret SMTP_PASSWORD
 
 export NODE_ENV=production
 
+
 node db/init.js
 exec node app.js --prod
 \n
