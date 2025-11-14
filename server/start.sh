@@ -7,7 +7,7 @@ set -eu
 
 read_secret() {
   local file="$1"
-  head -n 1 "$file" | tr -d '\r\n'
+  head -n 1 "$file" | tr -d '\n'
 }
 
 load_secret() {
@@ -35,3 +35,4 @@ export NODE_ENV=production
 
 node db/init.js
 exec node app.js --prod
+\n
