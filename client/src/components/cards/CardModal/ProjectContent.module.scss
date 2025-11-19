@@ -60,7 +60,19 @@
     vertical-align: top;
   }
 
-  .attachmentDueDate {
+  .priorityChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  background-color: var(--background-secondary);
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.attachmentDueDate {
     align-items: center;
     display: flex;
     gap: 4px;

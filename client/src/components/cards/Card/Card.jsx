@@ -25,7 +25,7 @@ import ActionsStep from './ActionsStep';
 import styles from './Card.module.scss';
 import globalStyles from '../../../styles.module.scss';
 
-const Card = React.memo(({ id, isInline }) => {
+const Card = React.memo(({ id, isInline, children }) => {
   const selectCardById = useMemo(() => selectors.makeSelectCardById(), []);
   const selectIsCardWithIdRecent = useMemo(() => selectors.makeSelectIsCardWithIdRecent(), []);
   const selectListById = useMemo(() => selectors.makeSelectListById(), []);
@@ -53,13 +53,21 @@ const Card = React.memo(({ id, isInline }) => {
 
   const actionsPopupRef = useRef(null);
 
+  const pathname = useSelector(selectors.selectPathname);
+
   const handleClick = useCallback(() => {
     if (document.activeElement) {
       document.activeElement.blur();
     }
 
-    dispatch(push(Paths.CARDS.replace(':id', id)));
-  }, [id, dispatch]);
+    const isFromMentionedCards = pathname === Paths.MENTIONED_CARDS;
+    const pushState = isFromMentionedCards ? { returnTo: Paths.MENTIONED_CARDS } : undefined;
+    if (pushState) {
+      dispatch(push(Paths.CARDS.replace(':id', id), pushState));
+    } else {
+      dispatch(push(Paths.CARDS.replace(':id', id)));
+    }
+  }, [id, dispatch, pathname]);
 
   const handleContextMenu = useCallback((event) => {
     if (!actionsPopupRef.current) {
@@ -128,6 +136,7 @@ const Card = React.memo(({ id, isInline }) => {
             <Content cardId={id} />
             {colorLineNode}
           </div>
+          {children}
           {canUseActions && (
             <ActionsPopup ref={actionsPopupRef} cardId={id} onNameEdit={handleNameEdit}>
               <Button className={styles.actionsButton}>
@@ -149,6 +158,7 @@ const Card = React.memo(({ id, isInline }) => {
 Card.propTypes = {
   id: PropTypes.string.isRequired,
   isInline: PropTypes.bool,
+  children: PropTypes.node,
 };
 
 Card.defaultProps = {

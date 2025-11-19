@@ -13,6 +13,9 @@ import { Popup } from '../../../lib/custom-ui';
 import selectors from '../../../selectors';
 import entryActions from '../../../entry-actions';
 import { UserRoles } from '../../../constants/Enums';
+import Paths from '../../../constants/Paths';
+import { push } from '../../../lib/redux-router';
+import { log } from '../../../utils/logger';
 
 import styles from './UserStep.module.scss';
 
@@ -39,6 +42,17 @@ const UserStep = React.memo(({ onClose }) => {
   const handleLogoutClick = useCallback(() => {
     dispatch(entryActions.logout());
   }, [dispatch]);
+
+  const handleMentionedCardsClick = useCallback(() => {
+    log('UserStep', 'handleMentionedCardsClick: navigating to', Paths.MENTIONED_CARDS);
+    dispatch(push(Paths.MENTIONED_CARDS));
+    onClose();
+  }, [dispatch, onClose]);
+
+  const handleMemberCardsClick = useCallback(() => {
+    dispatch(push(Paths.MEMBER_CARDS));
+    onClose();
+  }, [dispatch, onClose]);
 
   let logoutMenuItemProps;
   if (isLogouting) {
@@ -74,6 +88,13 @@ const UserStep = React.memo(({ onClose }) => {
               })}
             </Menu.Item>
           )}
+          <Menu.Item className={styles.menuItem} onClick={handleMentionedCardsClick}>
+            <Icon name="at" className={styles.menuItemIcon} />
+            {t('common.mentionedCards', {
+              defaultValue: 'Карточки с упоминаниями',
+              context: 'title',
+            })}
+          </Menu.Item>
           <hr className={styles.divider} />
           <Menu.Item
             {...logoutMenuItemProps} // eslint-disable-line react/jsx-props-no-spreading

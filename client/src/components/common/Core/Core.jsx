@@ -12,6 +12,7 @@ import selectors from '../../../selectors';
 import version from '../../../version';
 import ModalTypes from '../../../constants/ModalTypes';
 import Message from './Message';
+import { log } from '../../../utils/logger';
 import Toaster from '../Toaster';
 import Fixed from '../Fixed';
 import Static from '../Static';
@@ -110,6 +111,8 @@ const Core = React.memo(() => {
       />
     );
   }
+
+  log('Core', 'render: isInitializing', isInitializing, 'currentUserId', currentUserId);
 
   return (
     <>

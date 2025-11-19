@@ -103,6 +103,33 @@
   }
 }
 
+.attachment {
+  margin-top: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: #5e6c84;
+}
+
+.attachmentLink {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #0065ff;
+  text-decoration: none;
+  transition: color 0.2s ease;
+
+  &:hover {
+    color: #0052cc;
+    text-decoration: underline;
+  }
+
+  i {
+    margin: 0 !important;
+  }
+}
+
 .taskList {
   margin-top: 1rem;
   padding-top: 0.75rem;
@@ -135,6 +162,16 @@
     margin-top: 0.1rem;
     flex-shrink: 0;
   }
+}
+
+.checkbox {
+  margin-top: 0.1rem;
+  flex-shrink: 0;
+}
+
+.taskCompleted {
+  text-decoration: line-through;
+  opacity: 0.7;
 }
 
 .noCards {

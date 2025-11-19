@@ -11,6 +11,7 @@ import request from '../request';
 import selectors from '../../../selectors';
 import actions from '../../../actions';
 import api from '../../../api';
+import { log } from '../../../utils/logger';
 import { createLocalId } from '../../../utils/local-id';
 import { isListArchiveOrTrash, isListFinite } from '../../../utils/record-helpers';
 import ActionTypes from '../../../constants/ActionTypes';
@@ -107,6 +108,126 @@ export function* fetchCardsInCurrentList() {
   const currentListId = yield select(selectors.selectCurrentListId);
 
   yield call(fetchCards, currentListId);
+}
+
+export function* fetchMentionedCards() {
+  log('cards', 'fetchMentionedCards: starting');
+  const response = {};
+
+  try {
+    log('cards', 'fetchMentionedCards: calling api.getMentionedCards');
+    response.body = yield call(request, api.getMentionedCards);
+    log('cards', 'fetchMentionedCards: success, cards count:', response.body?.items?.length);
+  } catch (error) {
+    log('cards', 'fetchMentionedCards: error', error.code, error.message);
+    response.error = error;
+  }
+
+  if (response.error) {
+    log('cards', 'fetchMentionedCards: dispatching failure');
+    yield put(actions.fetchMentionedCards.failure(response.error));
+    return;
+  }
+
+  log('cards', 'fetchMentionedCards: response structure', {
+    hasBody: !!response.body,
+    bodyKeys: response.body ? Object.keys(response.body) : [],
+    hasItems: !!response.body?.items,
+    hasIncluded: !!response.body?.included,
+  });
+
+  try {
+    const {
+      body: {
+        items: cards,
+        included: {
+          users = [],
+          cardMemberships = [],
+          cardLabels = [],
+          taskLists = [],
+          tasks = [],
+          attachments = [],
+          customFieldGroups = [],
+          customFields = [],
+          customFieldValues = [],
+        } = {},
+      },
+    } = response;
+
+    log('cards', 'fetchMentionedCards: parsed successfully', {
+      cards: cards?.length,
+      taskLists: taskLists?.length,
+      tasks: tasks?.length,
+      attachments: attachments?.length,
+    });
+
+    yield put(
+      actions.fetchMentionedCards.success(
+        cards || [],
+        users || [],
+        cardMemberships || [],
+        cardLabels || [],
+        taskLists || [],
+        tasks || [],
+        attachments || [],
+        customFieldGroups || [],
+        customFields || [],
+        customFieldValues || [],
+      ),
+    );
+    log('cards', 'fetchMentionedCards: success dispatched');
+  } catch (error) {
+    log('cards', 'fetchMentionedCards: error parsing response', error);
+    log('cards', 'fetchMentionedCards: response was', response);
+    throw error;
+  }
+}
+
+export function* fetchMemberCards() {
+  const response = {};
+
+  try {
+    response.body = yield call(request, api.getMemberCards);
+  } catch (error) {
+    response.error = error;
+  }
+
+  if (response.error) {
+    yield put(actions.fetchMemberCards.failure(response.error));
+    return;
+  }
+
+  const {
+    body: {
+      items: cards,
+      included: {
+        users,
+        cardMemberships,
+        cardLabels,
+        taskLists,
+        tasks,
+        attachments,
+        customFieldGroups,
+        customFields,
+        customFieldValues,
+      },
+    },
+  } = response;
+
+  yield put(
+    actions.fetchMemberCards.success(
+      cards,
+      users,
+      cardMemberships,
+      cardLabels,
+      taskLists,
+      tasks,
+      attachments,
+      customFieldGroups,
+      customFields,
+      customFieldValues,
+    ),
+  );
 }
 
 export function* handleCardsUpdate(cards, activities) {
@@ -599,6 +720,7 @@ export function* handleCardDelete(card) {
 export default {
   fetchCards,
   fetchCardsInCurrentList,
+  fetchMentionedCards,
   handleCardsUpdate,
   createCard,
   createCardInFirstFiniteList,

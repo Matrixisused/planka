@@ -105,6 +105,8 @@
 
   .wrapper {
     padding: 6px 8px 0;
+    position: relative;
+    overflow: hidden;
 
     &:after {
       clear: both;

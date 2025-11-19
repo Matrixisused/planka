@@ -51,4 +51,6 @@ module.exports.policies = {
 
   'public/show-board': true,
   'public/show-list': true,
+  'public/update-task': true,
+  'public/download-attachment': true,
 };

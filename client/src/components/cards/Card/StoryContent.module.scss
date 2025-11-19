@@ -95,6 +95,8 @@
 
   .wrapper {
     padding: 8px 8px 0;
+    position: relative;
+    overflow: hidden;
   }
 
   :global(.card):hover {

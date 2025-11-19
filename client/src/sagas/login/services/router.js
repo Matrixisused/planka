@@ -10,6 +10,7 @@ import { authenticateWithOidc, authenticateWithOidcCallback } from './login';
 import selectors from '../../../selectors';
 import ActionTypes from '../../../constants/ActionTypes';
 import Paths from '../../../constants/Paths';
+import { log } from '../../../utils/logger';
 
 export function* goTo(pathname) {
   yield put(push(pathname));
@@ -24,9 +25,12 @@ export function* goToRoot() {
 }
 
 export function* handleLocationChange() {
+  log('login-router', 'handleLocationChange: called');
   const pathsMatch = yield select(selectors.selectPathsMatch);
+  log('login-router', 'handleLocationChange: path', pathsMatch?.pattern?.path);
 
   if (!pathsMatch) {
+    log('login-router', 'handleLocationChange: no pathsMatch');
     return;
   }
 
@@ -35,10 +39,12 @@ export function* handleLocationChange() {
     case Paths.PROJECTS:
     case Paths.BOARDS:
     case Paths.CARDS:
+      log('login-router', 'handleLocationChange: redirecting to login for', pathsMatch.pattern.path);
       yield call(goToLogin);
 
       break;
     default:
+      log('login-router', 'handleLocationChange: no redirect for', pathsMatch.pattern.path);
   }
 
   const isInitializing = yield select(selectors.selectIsInitializing);

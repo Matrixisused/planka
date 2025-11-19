@@ -1,0 +1,53 @@
+:global(#app) {
+  .wrapper {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    height: 100%;
+    overflow-y: auto;
+
+    @supports (-moz-appearance: none) {
+      scrollbar-color: rgba(0, 0, 0, 0.32) rgba(0, 0, 0, 0.08);
+    }
+  }
+
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+
+  .title {
+    font-size: 24px;
+    font-weight: 600;
+    color: #b8c5d0;
+    margin: 0;
+    flex: 1;
+  }
+
+  .toggleButton {
+    margin-left: 16px;
+    flex-shrink: 0;
+  }
+
+  .cards {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .card {
+    width: 100%;
+  }
+
+  .empty {
+    padding: 40px;
+    text-align: center;
+    color: #6b808c;
+    font-size: 16px;
+  }
+}

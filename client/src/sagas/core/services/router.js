@@ -11,10 +11,10 @@ import request from '../request';
 import selectors from '../../../selectors';
 import actions from '../../../actions';
 import api from '../../../api';
-import { getAccessToken } from '../../../utils/access-token-storage';
 import mergeRecords from '../../../utils/merge-records';
 import ActionTypes from '../../../constants/ActionTypes';
 import Paths from '../../../constants/Paths';
+import { log } from '../../../utils/logger';
 
 export function* goTo(pathname) {
   yield put(push(pathname));
@@ -33,18 +33,28 @@ export function* goToBoard(boardId) {
 }
 
 export function* goToCard(cardId) {
-  yield call(goTo, Paths.CARDS.replace(':id', cardId));
+  const locationState = yield select(selectors.selectLocationState);
+  const returnTo = locationState?.returnTo;
+
+  if (returnTo) {
+    yield put(push(Paths.CARDS.replace(':id', cardId), { returnTo }));
+  } else {
+    yield put(push(Paths.CARDS.replace(':id', cardId)));
+  }
 }
 
 export function* handleLocationChange() {
-  const accessToken = yield call(getAccessToken);
+  const accessToken = yield select(selectors.selectAccessToken);
+  log('router', 'handleLocationChange: accessToken exists?', !!accessToken);
 
   if (!accessToken) {
+    log('router', 'handleLocationChange: no accessToken, logging out');
     yield call(logout, false);
     return;
   }
 
   const pathsMatch = yield select(selectors.selectPathsMatch);
+  log('router', 'handleLocationChange: path', pathsMatch?.pattern?.path);
 
   if (!pathsMatch) {
     yield put(actions.handleLocationChange());
@@ -72,7 +82,7 @@ export function* handleLocationChange() {
   let currentCardId = null;
   let isEditModeEnabled;
   let board;
-  let card;
+  let card = null;
   let users1;
   let users2;
   let projects;
@@ -100,6 +110,12 @@ export function* handleLocationChange() {
 
   switch (pathsMatch.pattern.path) {
     case Paths.ROOT:
+      isEditModeEnabled = false;
+
+      break;
+    case Paths.MENTIONED_CARDS:
+    case Paths.MEMBER_CARDS:
+      log('router', 'handleLocationChange: MENTIONED_CARDS/MEMBER_CARDS path');
       isEditModeEnabled = false;
 
       break;
@@ -148,8 +164,22 @@ export function* handleLocationChange() {
       break;
     case Paths.CARDS:
       ({ cardId: currentCardId, boardId: currentBoardId } = yield select(selectors.selectPath));
+      log('router', 'handleLocationChange: CARDS path', {
+        currentCardId,
+        currentBoardId,
+        cardIdFromPath: pathsMatch.params.id,
+      });
 
-      if (!currentCardId) {
+      // Check if card exists in ORM, not just if cardId is set
+      const cardInOrm = yield select(selectors.selectCardById, pathsMatch.params.id);
+      log('router', 'handleLocationChange: cardInOrm check', {
+        cardId: pathsMatch.params.id,
+        cardInOrm: !!cardInOrm,
+        cardInOrmId: cardInOrm?.id,
+      });
+
+      if (!cardInOrm) {
+        log('router', 'handleLocationChange: card not in ORM, loading card', pathsMatch.params.id);
         yield put(actions.handleLocationChange.fetchContent());
 
         try {
@@ -172,6 +202,10 @@ export function* handleLocationChange() {
         }
 
         if (card) {
+          log('router', 'handleLocationChange: card loaded', {
+            cardId: card.id,
+            boardId: card.boardId,
+          });
           ({ id: currentCardId } = card);
 
           currentBoard = yield select(selectors.selectBoardById, card.boardId);
@@ -204,6 +238,105 @@ export function* handleLocationChange() {
                 /* empty */
               }
             }
+          } else {
+            // Board not found in state, load it
+            currentBoardId = card.boardId;
+            log('router', 'handleLocationChange: board not found in state, loading board', currentBoardId);
+
+            try {
+              ({
+                item: board,
+                included: {
+                  projects,
+                  boardMemberships,
+                  labels,
+                  lists,
+                  cards,
+                  users: users2,
+                  cardMemberships: cardMemberships2,
+                  cardLabels: cardLabels2,
+                  taskLists: taskLists2,
+                  tasks: tasks2,
+                  attachments: attachments2,
+                  customFieldGroups: customFieldGroups2,
+                  customFields: customFields2,
+                  customFieldValues: customFieldValues2,
+                },
+              } = yield call(request, api.getBoard, card.boardId, true));
+            } catch {
+              /* empty */
+            }
+          }
+        }
+      } else {
+        // Card already in ORM, but we still need to load full card data (taskLists, tasks, attachments, etc.)
+        log('router', 'handleLocationChange: card already in ORM, loading full card data', {
+          cardId: cardInOrm.id,
+          currentCardId,
+        });
+        if (!currentCardId) {
+          currentCardId = cardInOrm.id;
+        }
+
+        // Load full card data to get taskLists, tasks, attachments, etc.
+        yield put(actions.handleLocationChange.fetchContent());
+
+        try {
+          ({
+            item: card,
+            included: {
+              users: users1,
+              cardMemberships: cardMemberships1,
+              cardLabels: cardLabels1,
+              taskLists: taskLists1,
+              tasks: tasks1,
+              attachments: attachments1,
+              customFieldGroups: customFieldGroups1,
+              customFields: customFields1,
+              customFieldValues: customFieldValues1,
+            },
+          } = yield call(request, api.getCard, pathsMatch.params.id));
+          log('router', 'handleLocationChange: full card data loaded', {
+            cardId: card?.id,
+            hasTaskLists: !!taskLists1?.length,
+            hasTasks: !!tasks1?.length,
+            hasAttachments: !!attachments1?.length,
+          });
+        } catch {
+          /* empty */
+        }
+
+        // Load board if not already loaded
+        if (!currentBoardId) {
+          currentBoardId = cardInOrm.boardId;
+        }
+
+        currentBoard = yield select(selectors.selectBoardById, cardInOrm.boardId);
+
+        if (!currentBoard || currentBoard.isFetching === null) {
+          log('router', 'handleLocationChange: loading board for card in ORM', cardInOrm.boardId);
+          try {
+            ({
+              item: board,
+              included: {
+                projects,
+                boardMemberships,
+                labels,
+                lists,
+                cards,
+                users: users2,
+                cardMemberships: cardMemberships2,
+                cardLabels: cardLabels2,
+                taskLists: taskLists2,
+                tasks: tasks2,
+                attachments: attachments2,
+                customFieldGroups: customFieldGroups2,
+                customFields: customFields2,
+                customFieldValues: customFieldValues2,
+              },
+            } = yield call(request, api.getBoard, cardInOrm.boardId, true));
+          } catch {
+            /* empty */
           }
         }
       }
@@ -228,6 +361,13 @@ export function* handleLocationChange() {
       break;
     default:
   }
+
+  log('router', 'handleLocationChange: final state', {
+    currentCardId,
+    currentBoardId,
+    hasCard: !!card,
+    hasBoard: !!board,
+  });
 
   yield put(
     actions.handleLocationChange(

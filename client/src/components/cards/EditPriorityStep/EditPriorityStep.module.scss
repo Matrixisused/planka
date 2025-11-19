@@ -1,0 +1,25 @@
+.fieldWrapper {
+  margin-bottom: 20px;
+}
+
+.fieldBox {
+  margin-bottom: 16px;
+}
+
+.text {
+  margin-bottom: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.hint {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--text-secondary);
+}
+
+.deleteButton {
+  margin-top: 12px;
+  width: 100%;
+}

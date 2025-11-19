@@ -23,6 +23,10 @@ module.exports = function defineWatcherHook(sails) {
       try {
         sails.helpers.utils.verifyJwtToken(accessToken);
       } catch (error) {
+        sails.log.warn('[watcher] Invalid token detected, sending logout event', {
+          room,
+          error: error.message,
+        });
         sails.sockets.broadcast(room, 'logout');
         sails.sockets.leaveAll(room);
       }

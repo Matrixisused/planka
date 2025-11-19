@@ -3,13 +3,52 @@
  * Licensed under the Fair Use License: https://github.com/plankanban/planka/blob/master/LICENSE.md
  */
 
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
+import PropTypes from 'prop-types';
 import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Container, Header, Icon, Loader, Message, Segment } from 'semantic-ui-react';
+import { Checkbox, Container, Header, Icon, Loader, Message, Segment } from 'semantic-ui-react';
 import api from '../../api';
 
 import styles from './PublicBoard.module.scss';
+
+const TaskItem = React.memo(({ task, token, onUpdate }) => {
+  const [isUpdating, setIsUpdating] = useState(false);
+
+  const handleToggle = useCallback(async () => {
+    if (isUpdating) return;
+
+    setIsUpdating(true);
+    try {
+      const { item: updatedTask } = await api.updatePublicTask(token, task.id, {
+        isCompleted: !task.isCompleted,
+      });
+      onUpdate(updatedTask);
+    } catch (error) {
+      console.error('Failed to update task:', error);
+    } finally {
+      setIsUpdating(false);
+    }
+  }, [task, token, isUpdating, onUpdate]);
+
+  return (
+    <li className={styles.task}>
+      <Checkbox
+        checked={task.isCompleted}
+        disabled={isUpdating}
+        onChange={handleToggle}
+        className={styles.checkbox}
+      />
+      <span className={task.isCompleted ? styles.taskCompleted : ''}>{task.name}</span>
+    </li>
+  );
+});
+
+TaskItem.propTypes = {
+  task: PropTypes.object.isRequired,
+  token: PropTypes.string.isRequired,
+  onUpdate: PropTypes.func.isRequired,
+};
 
 const PublicBoard = React.memo(() => {
   const { token } = useParams();
@@ -113,6 +152,22 @@ const PublicBoard = React.memo(() => {
                               {new Date(card.dueDate).toLocaleDateString()}
                             </div>
                           )}
+                          {included.attachments &&
+                            included.attachments
+                              .filter((attachment) => attachment.cardId === card.id)
+                              .map((attachment) => (
+                                <div key={attachment.id} className={styles.attachment}>
+                                  <a
+                                    href={attachment.data.url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className={styles.attachmentLink}
+                                  >
+                                    <Icon name="paperclip" />
+                                    <span>{attachment.name || attachment.data.filename}</span>
+                                  </a>
+                                </div>
+                              ))}
                           {included.taskLists &&
                             included.taskLists
                               .filter((tl) => tl.cardId === card.id)
@@ -128,14 +183,26 @@ const PublicBoard = React.memo(() => {
                                     </Header>
                                     <ul>
                                       {tasks.map((task) => (
-                                        <li key={task.id} className={styles.task}>
-                                          <Icon
-                                            name={
-                                              task.isCompleted ? 'check square' : 'square outline'
-                                            }
-                                          />
-                                          <span>{task.name}</span>
-                                        </li>
+                                        <TaskItem
+                                          key={task.id}
+                                          task={task}
+                                          token={token}
+                                          onUpdate={(updatedTask) => {
+                                            setBoardData((prev) => {
+                                              if (!prev) return prev;
+                                              const updatedTasks = prev.included.tasks.map((t) =>
+                                                t.id === updatedTask.id ? updatedTask : t,
+                                              );
+                                              return {
+                                                ...prev,
+                                                included: {
+                                                  ...prev.included,
+                                                  tasks: updatedTasks,
+                                                },
+                                              };
+                                            });
+                                          }}
+                                        />
                                       ))}
                                     </ul>
                                   </div>

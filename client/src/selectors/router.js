@@ -17,6 +17,12 @@ export const selectPathname = ({
   },
 }) => pathname;
 
+export const selectLocationState = ({
+  router: {
+    location: { state },
+  },
+}) => state;
+
 export const selectPathsMatch = createReselectSelector(selectPathname, (pathname) =>
   matchPaths(pathname, Object.values(Paths)),
 );
@@ -61,7 +67,17 @@ export const selectPath = createReduxOrmSelector(
         case Paths.CARDS: {
           const cardModel = Card.withId(pathsMatch.params.id);
 
-          if (!cardModel || !cardModel.isAvailableForUser(currentUserModel)) {
+          // If card is not in ORM yet, return the cardId from URL params
+          // This allows the modal to open even if card data is still loading
+          if (!cardModel) {
+            return {
+              cardId: pathsMatch.params.id,
+              boardId: null,
+              projectId: null,
+            };
+          }
+
+          if (!cardModel.isAvailableForUser(currentUserModel)) {
             return {
               cardId: null,
               boardId: null,
@@ -87,4 +103,5 @@ export default {
   selectPathname,
   selectPathsMatch,
   selectPath,
+  selectLocationState,
 };

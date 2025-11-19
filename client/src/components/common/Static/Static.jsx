@@ -12,13 +12,17 @@ import { useTransitioning } from '../../../lib/hooks';
 
 import selectors from '../../../selectors';
 import { BoardViews } from '../../../constants/Enums';
+import Paths from '../../../constants/Paths';
 import Home from '../Home';
 import GhostError from '../GhostError';
 import Board from '../../boards/Board';
+import MentionedCards from '../../cards/MentionedCards';
+import MemberCards from '../../cards/MemberCards';
 
 import styles from './Static.module.scss';
 
 const Static = React.memo(() => {
+  const pathname = useSelector(selectors.selectPathname);
   const { cardId, projectId } = useSelector(selectors.selectPath);
   const board = useSelector(selectors.selectCurrentBoard);
   const isFetching = useSelector(selectors.selectIsContentFetching);
@@ -38,6 +42,12 @@ const Static = React.memo(() => {
   if (isFetching) {
     wrapperClassNames = [styles.wrapperLoader];
     contentNode = <Loader active size="huge" />;
+  } else if (pathname === Paths.MENTIONED_CARDS) {
+    wrapperClassNames = [isFavoritesActive && styles.wrapperWithFavorites, styles.wrapperVertical];
+    contentNode = <MentionedCards />;
+  } else if (pathname === Paths.MEMBER_CARDS) {
+    wrapperClassNames = [isFavoritesActive && styles.wrapperWithFavorites, styles.wrapperVertical];
+    contentNode = <MemberCards />;
   } else if (projectId === undefined) {
     wrapperClassNames = [isFavoritesActive && styles.wrapperWithFavorites, styles.wrapperVertical];
     contentNode = <Home />;

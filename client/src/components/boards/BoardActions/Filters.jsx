@@ -35,7 +35,7 @@ const Filters = React.memo(() => {
 
   const dispatch = useDispatch();
   const [t] = useTranslation();
-  const [search, setSearch] = useState(board.search);
+  const [search, setSearch] = useState(board?.search || '');
   const [isSearchFocused, setIsSearchFocused] = useState(false);
 
   const debouncedSearch = useMemo(

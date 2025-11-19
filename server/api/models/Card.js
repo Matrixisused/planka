@@ -93,6 +93,13 @@
  *           nullable: true
  *           description: Whether the due date is completed
  *           example: false
+ *         priority:
+ *           type: number
+ *           nullable: true
+ *           minimum: 0
+ *           maximum: 100
+ *           description: Priority of the card (0-100)
+ *           example: 50
  *         stopwatch:
  *           type: object
  *           required:
@@ -196,6 +203,12 @@ module.exports = {
     listChangedAt: {
       type: 'ref',
       columnName: 'list_changed_at',
+    },
+    priority: {
+      type: 'number',
+      min: 0,
+      max: 100,
+      allowNull: true,
     },
 
     //  ╔═╗╔╦╗╔╗ ╔═╗╔╦╗╔═╗

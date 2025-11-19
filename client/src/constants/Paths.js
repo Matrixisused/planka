@@ -10,6 +10,8 @@ const PROJECTS = '/projects/:id';
 const BOARDS = '/boards/:id';
 const CARDS = '/cards/:id';
 const PUBLIC = '/public/:token';
+const MENTIONED_CARDS = '/mentioned-cards';
+const MEMBER_CARDS = '/member-cards';
 
 export default {
   ROOT,
@@ -19,4 +21,6 @@ export default {
   BOARDS,
   CARDS,
   PUBLIC,
+  MENTIONED_CARDS,
+  MEMBER_CARDS,
 };

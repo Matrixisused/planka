@@ -233,6 +233,82 @@ const handleCardDelete = (card) => ({
   },
 });
 
+const fetchMentionedCards = () => ({
+  type: ActionTypes.MENTIONED_CARDS_FETCH,
+});
+
+fetchMentionedCards.success = (
+  cards,
+  users,
+  cardMemberships,
+  cardLabels,
+  taskLists,
+  tasks,
+  attachments,
+  customFieldGroups,
+  customFields,
+  customFieldValues,
+) => ({
+  type: ActionTypes.MENTIONED_CARDS_FETCH__SUCCESS,
+  payload: {
+    cards,
+    users,
+    cardMemberships,
+    cardLabels,
+    taskLists,
+    tasks,
+    attachments,
+    customFieldGroups,
+    customFields,
+    customFieldValues,
+  },
+});
+
+fetchMentionedCards.failure = (error) => ({
+  type: ActionTypes.MENTIONED_CARDS_FETCH__FAILURE,
+  payload: {
+    error,
+  },
+});
+
+const fetchMemberCards = () => ({
+  type: ActionTypes.MEMBER_CARDS_FETCH,
+});
+
+fetchMemberCards.success = (
+  cards,
+  users,
+  cardMemberships,
+  cardLabels,
+  taskLists,
+  tasks,
+  attachments,
+  customFieldGroups,
+  customFields,
+  customFieldValues,
+) => ({
+  type: ActionTypes.MEMBER_CARDS_FETCH__SUCCESS,
+  payload: {
+    cards,
+    users,
+    cardMemberships,
+    cardLabels,
+    taskLists,
+    tasks,
+    attachments,
+    customFieldGroups,
+    customFields,
+    customFieldValues,
+  },
+});
+
+fetchMemberCards.failure = (error) => ({
+  type: ActionTypes.MEMBER_CARDS_FETCH__FAILURE,
+  payload: {
+    error,
+  },
+});
+
 export default {
   fetchCards,
   handleCardsUpdate,
@@ -243,4 +319,6 @@ export default {
   duplicateCard,
   deleteCard,
   handleCardDelete,
+  fetchMentionedCards,
+  fetchMemberCards,
 };

@@ -26,6 +26,15 @@
     }
   }
 
+  .buttonMentioned {
+    background: #4caf50 !important;
+    color: #fff !important;
+
+    &:hover {
+      background: #45a049 !important;
+    }
+  }
+
   .buttonGroup {
     .button {
       border-radius: 0;

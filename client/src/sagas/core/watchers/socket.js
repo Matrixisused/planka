@@ -10,6 +10,7 @@ import services from '../services';
 import entryActions from '../../../entry-actions';
 import api, { socket } from '../../../api';
 import EntryActionTypes from '../../../constants/EntryActionTypes';
+import { log } from '../../../utils/logger';
 
 const createSocketEventsChannel = () =>
   eventChannel((emit) => {
@@ -22,6 +23,8 @@ const createSocketEventsChannel = () =>
     };
 
     const handleLogout = () => {
+      log('socket', 'handleLogout: socket logout event received');
+      log('socket', 'handleLogout: stack trace', new Error().stack);
       emit(entryActions.logout(false));
     };
 

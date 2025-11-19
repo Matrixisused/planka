@@ -8,9 +8,11 @@ import classNames from 'classnames';
 import { useDispatch, useSelector } from 'react-redux';
 import { Icon } from 'semantic-ui-react';
 import { usePopup } from '../../../../lib/popup';
+import { push } from '../../../../lib/redux-router';
 
 import selectors from '../../../../selectors';
 import entryActions from '../../../../entry-actions';
+import Paths from '../../../../constants/Paths';
 import { HomeViews } from '../../../../constants/Enums';
 import { HomeViewIcons, ProjectOrderIcons } from '../../../../constants/Icons';
 import SelectOrderStep from './SelectOrderStep';
@@ -42,10 +44,24 @@ const RightSide = React.memo(() => {
     dispatch(entryActions.toggleHiddenProjects(!isHiddenVisible));
   }, [isHiddenVisible, dispatch]);
 
+  const handleMentionedCardsClick = useCallback(() => {
+    dispatch(push(Paths.MENTIONED_CARDS));
+  }, [dispatch]);
+
   const SelectOrderPopup = usePopup(SelectOrderStep);
 
   return (
     <>
+      <div className={styles.action}>
+        <button
+          type="button"
+          className={classNames(styles.button, styles.buttonMentioned)}
+          onClick={handleMentionedCardsClick}
+          title="Карточки с упоминаниями"
+        >
+          <Icon fitted name="at" />
+        </button>
+      </div>
       <div className={styles.action}>
         <button
           type="button"

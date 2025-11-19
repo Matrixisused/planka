@@ -7,6 +7,7 @@ import socketIOClient from 'socket.io-client';
 import sailsIOClient from 'sails.io.js';
 
 import Config from '../constants/Config';
+import { log } from '../utils/logger';
 
 const io = sailsIOClient(socketIOClient);
 
@@ -23,6 +24,13 @@ socket.connect = socket._connect; // eslint-disable-line no-underscore-dangle
 ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'].forEach((method) => {
   socket[method.toLowerCase()] = (url, data, headers) =>
     new Promise((resolve, reject) => {
+      log('socket', `socket.${method.toLowerCase()}: called`, {
+        url,
+        hasHeaders: !!headers,
+        hasAuthorization: !!(headers && headers.Authorization),
+        headersKeys: headers ? Object.keys(headers) : [],
+      });
+
       socket.request(
         {
           method,

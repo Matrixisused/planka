@@ -251,6 +251,127 @@ const delete_ = (criteria) => Card.destroy(criteria).fetch();
 
 const deleteOne = (criteria) => Card.destroyOne(criteria);
 
+const getByMentionedUserId = async (userId, { before, limit = 50 } = {}) => {
+  // Найти карточки с упоминаниями в описании
+  const descriptionQueryResult = await sails.sendNativeQuery(
+    `SELECT DISTINCT id FROM card WHERE description IS NOT NULL AND description ~ $1`,
+    [`@\\[.*?\\]\\(${userId}\\)`],
+  );
+  const cardIdsFromDescription = descriptionQueryResult.rows.map((row) => row.id);
+
+  // Найти карточки с упоминаниями в комментариях
+  const cardIdsFromComments = await Comment.qm.getCardIdsByMentionedUserId(userId);
+
+  // Найти карточки, где пользователь является участником
+  const cardMemberships = await CardMembership.qm.getByUserId(userId);
+  const cardIdsFromMemberships = cardMemberships.map((cm) => cm.cardId);
+
+  // Объединить и получить уникальные ID
+  const allCardIds = [...new Set([...cardIdsFromDescription, ...cardIdsFromComments, ...cardIdsFromMemberships])];
+
+  if (allCardIds.length === 0) {
+    return [];
+  }
+
+  // Получить доступные доски пользователя
+  const boardMemberships = await BoardMembership.qm.getByUserId(userId);
+  const availableBoardIds = boardMemberships.map((bm) => bm.boardId);
+
+  if (availableBoardIds.length === 0) {
+    return [];
+  }
+
+  // Использовать нативный SQL для сортировки по priority (DESC NULLS LAST), затем dueDate (ASC NULLS LAST)
+  const queryValues = [];
+  const inValues = allCardIds.map((cardId, index) => {
+    queryValues.push(cardId);
+    return `$${queryValues.length}`;
+  });
+
+  const boardInValues = availableBoardIds.map((boardId) => {
+    queryValues.push(boardId);
+    return `$${queryValues.length}`;
+  });
+
+  const limitValue = limit + 1; // Получаем на 1 больше для проверки наличия следующей страницы
+  queryValues.push(limitValue);
+
+  const query = `
+    SELECT * FROM card
+    WHERE id IN (${inValues.join(', ')})
+      AND board_id IN (${boardInValues.join(', ')})
+    ORDER BY
+      COALESCE(priority, -1) DESC,
+      CASE WHEN due_date IS NULL THEN 1 ELSE 0 END,
+      due_date ASC NULLS LAST,
+      created_at DESC
+    LIMIT $${queryValues.length}
+  `;
+
+  const queryResult = await sails.sendNativeQuery(query, queryValues);
+
+  // Преобразовать результаты в формат Waterline
+  const cards = await Promise.all(
+    queryResult.rows.map((row) => Card.findOne(row.id)),
+  );
+
+  return cards.filter((card) => card !== undefined);
+};
+
+const getByMemberUserId = async (userId, { before, limit = 50 } = {}) => {
+  // Получить все членства пользователя в карточках
+  const cardMemberships = await CardMembership.qm.getByUserId(userId);
+  const cardIds = cardMemberships.map((cm) => cm.cardId);
+
+  if (cardIds.length === 0) {
+    return [];
+  }
+
+  // Получить доступные доски пользователя
+  const boardMemberships = await BoardMembership.qm.getByUserId(userId);
+  const availableBoardIds = boardMemberships.map((bm) => bm.boardId);
+
+  if (availableBoardIds.length === 0) {
+    return [];
+  }
+
+  // Использовать нативный SQL для сортировки по priority (DESC NULLS LAST), затем dueDate (ASC NULLS LAST)
+  const queryValues = [];
+  const inValues = cardIds.map((cardId) => {
+    queryValues.push(cardId);
+    return `$${queryValues.length}`;
+  });
+
+  const boardInValues = availableBoardIds.map((boardId) => {
+    queryValues.push(boardId);
+    return `$${queryValues.length}`;
+  });
+
+  const limitValue = limit + 1;
+  queryValues.push(limitValue);
+
+  const query = `
+    SELECT * FROM card
+    WHERE id IN (${inValues.join(', ')})
+      AND board_id IN (${boardInValues.join(', ')})
+    ORDER BY
+      COALESCE(priority, -1) DESC,
+      CASE WHEN due_date IS NULL THEN 1 ELSE 0 END,
+      due_date ASC NULLS LAST,
+      created_at DESC
+    LIMIT $${queryValues.length}
+  `;
+
+  const queryResult = await sails.sendNativeQuery(query, queryValues);
+
+  // Преобразовать результаты в формат Waterline
+  const cards = await Promise.all(
+    queryResult.rows.map((row) => Card.findOne(row.id)),
+  );
+
+  return cards.filter((card) => card !== undefined);
+};
+
 module.exports = {
   getIdsByEndlessListId,
 
@@ -261,6 +382,8 @@ module.exports = {
   getByEndlessListId,
   getByListIds,
   getOneById,
+  getByMentionedUserId,
+  getByMemberUserId,
   update,
   updateOne,
   deleteOne,

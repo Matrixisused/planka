@@ -14,6 +14,10 @@ const initialState = {
   isLogouting: false,
   isFavoritesEnabled: false,
   isEditModeEnabled: false,
+  isMentionedCardsFetching: false,
+  mentionedCardIds: [],
+  isMemberCardsFetching: false,
+  memberCardIds: [],
   modal: null,
   config: null,
   boardId: null,
@@ -155,6 +159,38 @@ export default (state = initialState, { type, payload }) => {
       return {
         ...state,
         isHiddenProjectsVisible: payload.isVisible,
+      };
+    case ActionTypes.MENTIONED_CARDS_FETCH:
+      return {
+        ...state,
+        isMentionedCardsFetching: true,
+      };
+    case ActionTypes.MENTIONED_CARDS_FETCH__SUCCESS:
+      return {
+        ...state,
+        isMentionedCardsFetching: false,
+        mentionedCardIds: payload.cards.map((card) => card.id),
+      };
+    case ActionTypes.MENTIONED_CARDS_FETCH__FAILURE:
+      return {
+        ...state,
+        isMentionedCardsFetching: false,
+      };
+    case ActionTypes.MEMBER_CARDS_FETCH:
+      return {
+        ...state,
+        isMemberCardsFetching: true,
+      };
+    case ActionTypes.MEMBER_CARDS_FETCH__SUCCESS:
+      return {
+        ...state,
+        isMemberCardsFetching: false,
+        memberCardIds: payload.cards.map((card) => card.id),
+      };
+    case ActionTypes.MEMBER_CARDS_FETCH__FAILURE:
+      return {
+        ...state,
+        isMemberCardsFetching: false,
       };
     case ActionTypes.BOARD_DELETE:
       if (

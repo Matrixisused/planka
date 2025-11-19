@@ -19,9 +19,10 @@ import BoardMemberships from '../../board-memberships/BoardMemberships';
 import styles from './BoardActions.module.scss';
 
 const BoardActions = React.memo(() => {
-  const boardContext = useSelector((state) => selectors.selectCurrentBoard(state).context);
+  const board = useSelector(selectors.selectCurrentBoard);
+  const boardContext = board?.context;
 
-  const withContextTitle = boardContext !== BoardContexts.BOARD;
+  const withContextTitle = boardContext && boardContext !== BoardContexts.BOARD;
 
   const withMemberships = useSelector((state) => {
     if (withContextTitle) {
@@ -42,7 +43,7 @@ const BoardActions = React.memo(() => {
   return (
     <div className={styles.wrapper}>
       <div className={styles.actions}>
-        {withContextTitle && (
+        {withContextTitle && boardContext && (
           <div className={styles.action}>
             <div className={styles.contextTitle}>
               <Icon name={BoardContextIcons[boardContext]} className={styles.contextTitleIcon} />

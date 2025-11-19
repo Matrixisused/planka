@@ -135,7 +135,7 @@ module.exports = {
     cors: {
       allRoutes: true,
       allowOrigins: origins.slice(1),
-      allowRequestHeaders: ['Authorization'],
+      allowRequestHeaders: ['Authorization', 'Content-Type'],
       allowCredentials: true,
     },
   },

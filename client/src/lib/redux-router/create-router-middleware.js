@@ -16,6 +16,12 @@ const createRouterMiddleware = (history) => {
       payload: { method, args },
     } = action;
 
+    if (method === 'push' && args[0] && typeof args[0] === 'object' && args[0].pathname) {
+      const { pathname, state } = args[0];
+      history[method](pathname, state);
+      return;
+    }
+
     history[method](...args);
   };
 };

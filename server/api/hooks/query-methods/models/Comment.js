@@ -48,6 +48,15 @@ const getByCardId = (cardId, { beforeId } = {}) => {
 
 const getOneById = (id) => Comment.findOne(id);
 
+const getCardIdsByMentionedUserId = async (userId) => {
+  const queryResult = await sails.sendNativeQuery(
+    `SELECT DISTINCT card_id FROM comment WHERE text ~ $1`,
+    [`@\\[.*?\\]\\(${userId}\\)`],
+  );
+
+  return queryResult.rows.map((row) => row.card_id);
+};
+
 const update = (criteria, values) => Comment.update(criteria).set(values).fetch();
 
 const updateOne = (criteria, values) => Comment.updateOne(criteria).set({ ...values });
@@ -118,6 +127,7 @@ module.exports = {
   getByIds,
   getByCardId,
   getOneById,
+  getCardIdsByMentionedUserId,
   update,
   updateOne,
   deleteOne,

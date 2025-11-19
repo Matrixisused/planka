@@ -17,6 +17,7 @@ import { isListArchiveOrTrash } from '../../../utils/record-helpers';
 import { BoardMembershipRoles, CardTypes, ListTypes } from '../../../constants/Enums';
 import SelectCardTypeStep from '../SelectCardTypeStep';
 import EditDueDateStep from '../EditDueDateStep';
+import EditPriorityStep from '../EditPriorityStep';
 import EditStopwatchStep from '../EditStopwatchStep';
 import MoveCardStep from '../MoveCardStep';
 import ConfirmationStep from '../../common/ConfirmationStep';
@@ -30,6 +31,7 @@ const StepTypes = {
   USERS: 'USERS',
   LABELS: 'LABELS',
   EDIT_DUE_DATE: 'EDIT_DUE_DATE',
+  EDIT_PRIORITY: 'EDIT_PRIORITY',
   EDIT_STOPWATCH: 'EDIT_STOPWATCH',
   MOVE: 'MOVE',
   ARCHIVE: 'ARCHIVE',
@@ -59,6 +61,7 @@ const ActionsStep = React.memo(({ cardId, onNameEdit, onClose }) => {
     canEditType,
     canEditName,
     canEditDueDate,
+    canEditPriority,
     canEditStopwatch,
     canDuplicate,
     canMove,
@@ -76,6 +79,7 @@ const ActionsStep = React.memo(({ cardId, onNameEdit, onClose }) => {
         canEditType: false,
         canEditName: false,
         canEditDueDate: false,
+        canEditPriority: false,
         canEditStopwatch: false,
         canDuplicate: false,
         canMove: false,
@@ -91,6 +95,7 @@ const ActionsStep = React.memo(({ cardId, onNameEdit, onClose }) => {
       canEditType: isEditor,
       canEditName: isEditor,
       canEditDueDate: isEditor,
+      canEditPriority: isEditor,
       canEditStopwatch: isEditor,
       canDuplicate: isEditor,
       canMove: isEditor,
@@ -196,6 +201,10 @@ const ActionsStep = React.memo(({ cardId, onNameEdit, onClose }) => {
     openStep(StepTypes.EDIT_DUE_DATE);
   }, [openStep]);
 
+  const handleEditPriorityClick = useCallback(() => {
+    openStep(StepTypes.EDIT_PRIORITY);
+  }, [openStep]);
+
   const handleEditStopwatchClick = useCallback(() => {
     openStep(StepTypes.EDIT_STOPWATCH);
   }, [openStep]);
@@ -247,6 +256,8 @@ const ActionsStep = React.memo(({ cardId, onNameEdit, onClose }) => {
         );
       case StepTypes.EDIT_DUE_DATE:
         return <EditDueDateStep cardId={cardId} onBack={handleBack} onClose={onClose} />;
+      case StepTypes.EDIT_PRIORITY:
+        return <EditPriorityStep cardId={cardId} onBack={handleBack} onClose={onClose} />;
       case StepTypes.EDIT_STOPWATCH:
         return <EditStopwatchStep cardId={cardId} onBack={handleBack} onClose={onClose} />;
       case StepTypes.MOVE:
@@ -332,6 +343,15 @@ const ActionsStep = React.memo(({ cardId, onNameEdit, onClose }) => {
             <Menu.Item className={styles.menuItem} onClick={handleEditDueDateClick}>
               <Icon name="calendar check outline" className={styles.menuItemIcon} />
               {t('action.editDueDate', {
+                context: 'title',
+              })}
+            </Menu.Item>
+          )}
+          {canEditPriority && (
+            <Menu.Item className={styles.menuItem} onClick={handleEditPriorityClick}>
+              <Icon name="flag outline" className={styles.menuItemIcon} />
+              {t('action.editPriority', {
+                defaultValue: 'Редактировать приоритет',
                 context: 'title',
               })}
             </Menu.Item>

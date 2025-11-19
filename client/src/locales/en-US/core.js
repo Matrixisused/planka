@@ -268,6 +268,13 @@ export default {
       pressPasteShortcutToAddAttachmentFromClipboard:
         'Tip: press Ctrl-V (Cmd-V on Mac) to add an attachment from the clipboard.',
       private: 'Private',
+      publicLink_title: 'Public Link',
+      publicLinkDescription: 'Create a public link to access the board without authorization.',
+      publicLinkWarning: 'Anyone with this link will be able to view the board content.',
+      publicUrl: 'Public URL',
+      publicView: 'Public View',
+      publicAccess_title: 'Public Access',
+      publicAccessDescription: 'Create a public link to access the board without authorization. Anyone with this link will be able to view the board content.',
       project: 'Project',
       projectNotFound_title: 'Project Not Found',
       projectOwner: 'Project owner',

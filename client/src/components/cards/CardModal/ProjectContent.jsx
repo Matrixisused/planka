@@ -27,6 +27,7 @@ import MoreActionsStep from './MoreActionsStep';
 import DueDateChip from '../DueDateChip';
 import StopwatchChip from '../StopwatchChip';
 import EditDueDateStep from '../EditDueDateStep';
+import EditPriorityStep from '../EditPriorityStep';
 import EditStopwatchStep from '../EditStopwatchStep';
 import ExpandableMarkdown from '../../common/ExpandableMarkdown';
 import EditMarkdown from '../../common/EditMarkdown';
@@ -71,6 +72,7 @@ const ProjectContent = React.memo(() => {
     canEditName,
     canEditDescription,
     canEditDueDate,
+    canEditPriority,
     canEditStopwatch,
     canSubscribe,
     canJoin,
@@ -102,6 +104,7 @@ const ProjectContent = React.memo(() => {
         canEditName: false,
         canEditDescription: false,
         canEditDueDate: false,
+        canEditPriority: false,
         canEditStopwatch: false,
         canSubscribe: isMember,
         canJoin: false,
@@ -124,6 +127,7 @@ const ProjectContent = React.memo(() => {
       canEditName: isEditor,
       canEditDescription: isEditor,
       canEditDueDate: isEditor,
+      canEditPriority: isEditor,
       canEditStopwatch: isEditor,
       canSubscribe: isMember,
       canJoin: isEditor,
@@ -309,6 +313,7 @@ const ProjectContent = React.memo(() => {
   const LabelsPopup = usePopupInClosableContext(LabelsStep);
   const ListsPopup = usePopupInClosableContext(ListsStep);
   const EditDueDatePopup = usePopupInClosableContext(EditDueDateStep);
+  const EditPriorityPopup = usePopupInClosableContext(EditPriorityStep);
   const EditStopwatchPopup = usePopupInClosableContext(EditStopwatchStep);
   const AddTaskListPopup = usePopupInClosableContext(AddTaskListStep);
   const AddAttachmentPopup = usePopupInClosableContext(AddAttachmentStep);
@@ -430,6 +435,30 @@ const ProjectContent = React.memo(() => {
                       </button>
                     </LabelsPopup>
                   )}
+                </div>
+              )}
+              {card.priority !== null && card.priority !== undefined && (
+                <div className={styles.attachments}>
+                  <div className={styles.text}>
+                    {t('common.priority', {
+                      defaultValue: 'Приоритет',
+                    })}
+                  </div>
+                  <span className={styles.attachment}>
+                    {canEditPriority ? (
+                      <EditPriorityPopup cardId={card.id}>
+                        <span className={styles.priorityChip}>
+                          <Icon name="flag" size="small" />
+                          {card.priority}
+                        </span>
+                      </EditPriorityPopup>
+                    ) : (
+                      <span className={styles.priorityChip}>
+                        <Icon name="flag" size="small" />
+                        {card.priority}
+                      </span>
+                    )}
+                  </span>
                 </div>
               )}
               {card.dueDate && (
@@ -593,6 +622,7 @@ const ProjectContent = React.memo(() => {
               </div>
             </div>
             {(canEditDueDate ||
+              canEditPriority ||
               canEditStopwatch ||
               canUseMembers ||
               canUseLabels ||
@@ -647,6 +677,17 @@ const ProjectContent = React.memo(() => {
                       })}
                     </Button>
                   </EditDueDatePopup>
+                )}
+                {canEditPriority && (
+                  <EditPriorityPopup cardId={card.id}>
+                    <Button fluid className={classNames(styles.actionButton, styles.hidable)}>
+                      <Icon name="flag outline" className={styles.actionIcon} />
+                      {t('common.priority', {
+                        defaultValue: 'Приоритет',
+                        context: 'title',
+                      })}
+                    </Button>
+                  </EditPriorityPopup>
                 )}
                 {canEditStopwatch && (
                   <EditStopwatchPopup cardId={card.id}>

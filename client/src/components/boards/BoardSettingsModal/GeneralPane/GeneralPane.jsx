@@ -12,6 +12,7 @@ import selectors from '../../../../selectors';
 import entryActions from '../../../../entry-actions';
 import { usePopupInClosableContext } from '../../../../hooks';
 import EditInformation from './EditInformation';
+import PublicAccess from './PublicAccess';
 import ConfirmationStep from '../../../common/ConfirmationStep';
 
 import styles from './GeneralPane.module.scss';
@@ -34,6 +35,14 @@ const GeneralPane = React.memo(() => {
   return (
     <Tab.Pane attached={false} className={styles.wrapper}>
       <EditInformation />
+      <Divider horizontal section>
+        <Header as="h4">
+          {t('common.publicAccess', {
+            context: 'title',
+          })}
+        </Header>
+      </Divider>
+      <PublicAccess />
       <Divider horizontal section>
         <Header as="h4">
           {t('common.dangerZone', {

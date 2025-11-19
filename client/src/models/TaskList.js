@@ -60,6 +60,15 @@ export default class extends BaseModel {
         });
 
         break;
+      case ActionTypes.MENTIONED_CARDS_FETCH__SUCCESS:
+      case ActionTypes.MEMBER_CARDS_FETCH__SUCCESS:
+        if (payload.taskLists) {
+          payload.taskLists.forEach((taskList) => {
+            TaskList.upsert(taskList);
+          });
+        }
+
+        break;
       case ActionTypes.TASK_LIST_CREATE:
       case ActionTypes.TASK_LIST_CREATE_HANDLE:
       case ActionTypes.TASK_LIST_UPDATE__SUCCESS:

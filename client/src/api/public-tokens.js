@@ -37,6 +37,9 @@ const deletePublicTokenForCard = (cardId, headers) =>
 
 const getPublicBoard = (token) => http.get(`/public/${token}`);
 
+const updatePublicTask = (token, taskId, data) =>
+  http.patch(`/public/${token}/tasks/${taskId}`, data);
+
 export default {
   getPublicTokenForBoard,
   createPublicTokenForBoard,
@@ -48,4 +51,5 @@ export default {
   createPublicTokenForCard,
   deletePublicTokenForCard,
   getPublicBoard,
+  updatePublicTask,
 };

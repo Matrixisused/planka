@@ -176,6 +176,16 @@ const handleCardDelete = (card) => ({
   },
 });
 
+const fetchMentionedCards = () => ({
+  type: EntryActionTypes.MENTIONED_CARDS_FETCH,
+  payload: {},
+});
+
+const fetchMemberCards = () => ({
+  type: EntryActionTypes.MEMBER_CARDS_FETCH,
+  payload: {},
+});
+
 export default {
   fetchCardsInCurrentList,
   handleCardsUpdate,
@@ -200,4 +210,6 @@ export default {
   deleteCard,
   deleteCurrentCard,
   handleCardDelete,
+  fetchMentionedCards,
+  fetchMemberCards,
 };

@@ -137,6 +137,8 @@ module.exports.routes = {
 
   'GET /api/lists/:listId/cards': 'cards/index',
   'POST /api/lists/:listId/cards': 'cards/create',
+  'GET /api/users/me/mentioned-cards': 'cards/mentioned',
+  'GET /api/users/me/member-cards': 'cards/member',
   'GET /api/cards/:id': 'cards/show',
   'PATCH /api/cards/:id': 'cards/update',
   'POST /api/cards/:id/duplicate': 'cards/duplicate',
@@ -195,6 +197,8 @@ module.exports.routes = {
   'POST /api/notifications/read-all': 'notifications/read-all',
 
   'GET /api/public/:token': 'public/show-board',
+  'PATCH /api/public/:token/tasks/:taskId': 'public/update-task',
+  'GET /api/public/:token/attachments/:id/download/:filename': 'public/download-attachment',
 
   'POST /api/users/:userId/notification-services': 'notification-services/create-in-user',
   'POST /api/boards/:boardId/notification-services': 'notification-services/create-in-board',

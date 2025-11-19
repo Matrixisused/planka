@@ -22,9 +22,10 @@ const TaskList = React.memo(({ id }) => {
   const taskLists = useSelector((state) => selectTaskListById(state, id));
   const tasks = useSelector((state) => selectTasksByTaskListId(state, id));
 
-  const defaultIsOpened = useSelector(
-    (state) => selectors.selectCurrentBoard(state).expandTaskListsByDefault,
-  );
+  const defaultIsOpened = useSelector((state) => {
+    const board = selectors.selectCurrentBoard(state);
+    return board?.expandTaskListsByDefault ?? true;
+  });
 
   const [isOpened, toggleOpened] = useToggle(defaultIsOpened);
 

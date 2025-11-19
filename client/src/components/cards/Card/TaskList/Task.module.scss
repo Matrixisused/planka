@@ -9,13 +9,19 @@
   }
 
   .name {
-    a:hover {
-      text-decoration: underline;
+    color: #17394d;
+
+    a {
+      color: #17394d;
+
+      &:hover {
+        text-decoration: underline;
+      }
     }
   }
 
   .nameCompleted {
-    color: #aaa;
+    color: #888;
     text-decoration: line-through;
   }
 

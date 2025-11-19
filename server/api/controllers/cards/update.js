@@ -73,6 +73,13 @@
  *                 nullable: true
  *                 description: Whether the due date is completed
  *                 example: false
+ *               priority:
+ *                 type: number
+ *                 nullable: true
+ *                 minimum: 0
+ *                 maximum: 100
+ *                 description: Priority of the card (0-100)
+ *                 example: 50
  *               stopwatch:
  *                 type: object
  *                 required:
@@ -188,6 +195,12 @@ module.exports = {
       type: 'boolean',
       allowNull: true,
     },
+    priority: {
+      type: 'number',
+      min: 0,
+      max: 100,
+      allowNull: true,
+    },
     stopwatch: {
       type: 'json',
       custom: isStopwatch,
@@ -267,6 +280,7 @@ module.exports = {
         'description',
         'dueDate',
         'isDueCompleted',
+        'priority',
         'stopwatch',
       );
     }
@@ -327,6 +341,7 @@ module.exports = {
       'description',
       'dueDate',
       'isDueCompleted',
+      'priority',
       'stopwatch',
       'isSubscribed',
     ]);

@@ -40,7 +40,12 @@ const InlineContent = React.memo(({ cardId }) => {
       return null;
     }
 
-    const { view } = selectors.selectCurrentBoard(state);
+    const currentBoard = selectors.selectCurrentBoard(state);
+    if (!currentBoard) {
+      return list.name;
+    }
+
+    const { view } = currentBoard;
 
     if (view === BoardViews.KANBAN) {
       return null;

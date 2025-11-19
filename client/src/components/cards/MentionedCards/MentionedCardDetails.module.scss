@@ -1,0 +1,75 @@
+.details {
+  margin-top: 12px;
+  padding-top: 12px;
+  padding-bottom: 12px;
+  padding-left: 12px;
+  padding-right: 12px;
+  border-top: 1px solid #e0e0e0;
+
+  /* Стили для элементов на белом фоне */
+  :global {
+    .count {
+      color: #333 !important;
+    }
+
+    .progressRow .count {
+      color: #333 !important;
+    }
+
+    .tasks {
+      color: #333 !important;
+    }
+
+    .name {
+      color: #17394d !important;
+
+      a {
+        color: #17394d !important;
+      }
+    }
+  }
+}
+
+.taskList {
+  margin-bottom: 12px;
+}
+
+.attachments {
+  margin-top: 12px;
+}
+
+.attachmentsList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.attachmentItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  background: #f5f5f5;
+
+  &:hover {
+    background-color: #ebebeb;
+  }
+}
+
+.attachmentIcon {
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.attachmentName {
+  flex: 1;
+  font-size: 14px;
+  color: #17394d;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

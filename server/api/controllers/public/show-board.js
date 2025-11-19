@@ -95,6 +95,7 @@ module.exports = {
 
     const tasks = await Task.qm.getByTaskListIds(taskListIds);
     const cardLabels = await CardLabel.qm.getByCardIds(cardIds);
+    const attachments = await Attachment.qm.getByCardIds(cardIds);
 
     const boardCustomFieldGroups = await CustomFieldGroup.qm.getByBoardId(board.id);
     const cardCustomFieldGroups = await CustomFieldGroup.qm.getByCardIds(cardIds);
@@ -105,6 +106,21 @@ module.exports = {
     const customFields = await CustomField.qm.getByCustomFieldGroupIds(customFieldGroupIds);
     const customFieldValues = await CustomFieldValue.qm.getByCardIds(cardIds);
 
+    // Transform attachments to include public URLs
+    const transformedAttachments = attachments.map((attachment) => {
+      const presented = sails.helpers.attachments.presentOne(attachment);
+      if (presented.type === Attachment.Types.FILE) {
+        // Replace URL with public URL
+        presented.data.url = `${sails.config.custom.baseUrl}/api/public/${inputs.token}/attachments/${attachment.id}/download/${attachment.data.filename}`;
+        if (presented.data.thumbnailUrls) {
+          // Thumbnails can use the same public endpoint pattern if needed
+          // For now, we'll keep them as is or remove them
+          delete presented.data.thumbnailUrls;
+        }
+      }
+      return presented;
+    });
+
     return {
       item: board,
       included: {
@@ -114,6 +130,7 @@ module.exports = {
         cardLabels,
         taskLists,
         tasks,
+        attachments: transformedAttachments,
         customFieldGroups,
         customFields,
         customFieldValues,

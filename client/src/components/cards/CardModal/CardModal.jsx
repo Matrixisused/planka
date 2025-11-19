@@ -33,6 +33,11 @@ const CardModal = React.memo(() => {
   const card = useSelector(selectors.selectCurrentCard);
   const prevCardId = useSelector(selectors.selectPrevCardId);
 
+  // If card is not loaded yet, don't render the modal
+  if (!card) {
+    return null;
+  }
+
   const canEdit = useSelector((state) => {
     const list = selectListById(state, card.listId);
 
@@ -46,13 +51,24 @@ const CardModal = React.memo(() => {
 
   const dispatch = useDispatch();
 
+  const locationState = useSelector(selectors.selectLocationState);
+  const returnTo = locationState?.returnTo;
+
   const handleClose = useCallback(() => {
-    dispatch(push(Paths.BOARDS.replace(':id', card.boardId)));
-  }, [card.boardId, dispatch]);
+    if (returnTo) {
+      dispatch(push(returnTo));
+    } else {
+      dispatch(push(Paths.BOARDS.replace(':id', card.boardId)));
+    }
+  }, [card.boardId, dispatch, returnTo]);
 
   const handlePrevClick = useCallback(() => {
-    dispatch(push(Paths.CARDS.replace(':id', prevCardId)));
-  }, [prevCardId, dispatch]);
+    if (returnTo) {
+      dispatch(push(Paths.CARDS.replace(':id', prevCardId), { returnTo }));
+    } else {
+      dispatch(push(Paths.CARDS.replace(':id', prevCardId)));
+    }
+  }, [prevCardId, dispatch, returnTo]);
 
   const [ClosableModal, isClosableActiveRef] = useClosableModal();
 

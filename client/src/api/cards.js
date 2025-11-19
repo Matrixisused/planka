@@ -108,6 +108,26 @@ const deleteCard = (id, headers) =>
     item: transformCard(body.item),
   }));
 
+const getMentionedCards = (data, headers) =>
+  socket.get('/users/me/mentioned-cards', data, headers).then((body) => ({
+    ...body,
+    items: body.items.map(transformCard),
+    included: {
+      ...body.included,
+      attachments: body.included.attachments.map(transformAttachment),
+    },
+  }));
+
+const getMemberCards = (data, headers) =>
+  socket.get('/users/me/member-cards', data, headers).then((body) => ({
+    ...body,
+    items: body.items.map(transformCard),
+    included: {
+      ...body.included,
+      attachments: body.included.attachments.map(transformAttachment),
+    },
+  }));
+
 /* Event handlers */
 
 const makeHandleCardsUpdate = (next) => (body) => {
@@ -140,6 +160,8 @@ export default {
   duplicateCard,
   readCardNotifications,
   deleteCard,
+  getMentionedCards,
+  getMemberCards,
   makeHandleCardsUpdate,
   makeHandleCardCreate,
   makeHandleCardUpdate,

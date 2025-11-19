@@ -20,6 +20,7 @@ export default class extends BaseModel {
     description: attr(),
     dueDate: attr(),
     isDueCompleted: attr(),
+    priority: attr(),
     stopwatch: attr(),
     isClosed: attr(),
     commentsTotal: attr({
@@ -84,10 +85,6 @@ export default class extends BaseModel {
   static reducer({ type, payload }, Card) {
     switch (type) {
       case ActionTypes.CORE_INITIALIZE:
-        console.log('[Card] CORE_INITIALIZE received:', {
-          cards: payload.cards?.length || 0,
-          cardMemberships: payload.cardMemberships?.length || 0,
-        });
         if (payload.cards) {
           payload.cards.forEach((card) => {
             Card.upsert(card);
@@ -95,14 +92,10 @@ export default class extends BaseModel {
         }
 
         if (payload.cardMemberships) {
-          console.log('[Card] Adding users to cards from cardMemberships:', payload.cardMemberships);
           payload.cardMemberships.forEach(({ cardId, userId }) => {
             const cardModel = Card.withId(cardId);
             if (cardModel) {
-              console.log(`[Card] Adding user ${userId} to card ${cardId}`);
               cardModel.users.add(userId);
-            } else {
-              console.log(`[Card] ERROR: Card ${cardId} not found!`);
             }
           });
         }
@@ -302,6 +295,8 @@ export default class extends BaseModel {
 
         break;
       case ActionTypes.CARDS_FETCH__SUCCESS:
+      case ActionTypes.MENTIONED_CARDS_FETCH__SUCCESS:
+      case ActionTypes.MEMBER_CARDS_FETCH__SUCCESS:
         payload.cards.forEach((card) => {
           const cardModel = Card.withId(card.id);
 

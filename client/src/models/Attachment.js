@@ -86,6 +86,15 @@ export default class extends BaseModel {
         });
 
         break;
+      case ActionTypes.MENTIONED_CARDS_FETCH__SUCCESS:
+      case ActionTypes.MEMBER_CARDS_FETCH__SUCCESS:
+        if (payload.attachments) {
+          payload.attachments.forEach((attachment) => {
+            Attachment.upsert(prepareAttachment(attachment));
+          });
+        }
+
+        break;
       case ActionTypes.ATTACHMENT_CREATE:
       case ActionTypes.ATTACHMENT_CREATE_HANDLE:
       case ActionTypes.ATTACHMENT_UPDATE__SUCCESS:

@@ -474,6 +474,78 @@ export const selectIsCurrentUserInCurrentCard = createSelector(
   },
 );
 
+export const selectMentionedCardIds = createSelector(
+  orm,
+  (state) => state.core.mentionedCardIds || [],
+  ({ Card }, mentionedCardIds) => {
+    if (mentionedCardIds.length === 0) {
+      return [];
+    }
+
+    // Получить карточки с упоминаниями, отсортированные по priority (DESC) и dueDate (ASC)
+    const cards = mentionedCardIds
+      .map((id) => Card.withId(id))
+      .filter((card) => card !== undefined)
+      .sort((a, b) => {
+        // Сначала по priority (больше = выше, null в конце)
+        const priorityA = a.priority ?? -1;
+        const priorityB = b.priority ?? -1;
+        if (priorityA !== priorityB) {
+          return priorityB - priorityA;
+        }
+        // Затем по dueDate (раньше = выше, null в конце)
+        if (a.dueDate && b.dueDate) {
+          return new Date(a.dueDate) - new Date(b.dueDate);
+        }
+        if (a.dueDate) return -1;
+        if (b.dueDate) return 1;
+        // В конце по createdAt (новее = выше)
+        return new Date(b.createdAt) - new Date(a.createdAt);
+      });
+
+    return cards.map((card) => card.id);
+  },
+);
+
+export const selectIsMentionedCardsFetching = (state) =>
+  state.core.isMentionedCardsFetching || false;
+
+export const selectMemberCardIds = createSelector(
+  orm,
+  (state) => state.core.memberCardIds || [],
+  ({ Card }, memberCardIds) => {
+    if (memberCardIds.length === 0) {
+      return [];
+    }
+
+    // Получить карточки, где пользователь участник, отсортированные по priority (DESC) и dueDate (ASC)
+    const cards = memberCardIds
+      .map((id) => Card.withId(id))
+      .filter((card) => card !== undefined)
+      .sort((a, b) => {
+        // Сначала по priority (больше = выше, null в конце)
+        const priorityA = a.priority ?? -1;
+        const priorityB = b.priority ?? -1;
+        if (priorityA !== priorityB) {
+          return priorityB - priorityA;
+        }
+        // Затем по dueDate (раньше = выше, null в конце)
+        if (a.dueDate && b.dueDate) {
+          return new Date(a.dueDate) - new Date(b.dueDate);
+        }
+        if (a.dueDate) return -1;
+        if (b.dueDate) return 1;
+        // В конце по createdAt (новее = выше)
+        return new Date(b.createdAt) - new Date(a.createdAt);
+      });
+
+    return cards.map((card) => card.id);
+  },
+);
+
+export const selectIsMemberCardsFetching = (state) =>
+  state.core.isMemberCardsFetching || false;
+
 export default {
   makeSelectCardById,
   selectCardById,
@@ -498,6 +570,10 @@ export default {
   selectIsCardWithIdAvailableForCurrentUser,
   selectCurrentCard,
   selectUserIdsForCurrentCard,
+  selectMentionedCardIds,
+  selectIsMentionedCardsFetching,
+  selectMemberCardIds,
+  selectIsMemberCardsFetching,
   selectCardMembershipsForCurrentCard,
   selectLabelIdsForCurrentCard,
   selectTaskListIdsForCurrentCard,

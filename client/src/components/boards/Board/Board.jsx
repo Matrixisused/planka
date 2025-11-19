@@ -20,6 +20,10 @@ const Board = React.memo(() => {
   const modal = useSelector(selectors.selectCurrentModal);
   const isCardModalOpened = useSelector((state) => !!selectors.selectPath(state).cardId);
 
+  if (!board) {
+    return null;
+  }
+
   let Content;
   if (board.view === BoardViews.KANBAN) {
     Content = KanbanContent;
@@ -36,6 +40,10 @@ const Board = React.memo(() => {
         break;
       default:
     }
+  }
+
+  if (!Content) {
+    return null;
   }
 
   let modalNode = null;

@@ -13,6 +13,8 @@ export default function* cardsWatchers() {
     takeEvery(EntryActionTypes.CARDS_IN_CURRENT_LIST_FETCH, () =>
       services.fetchCardsInCurrentList(),
     ),
+    takeEvery(EntryActionTypes.MENTIONED_CARDS_FETCH, () => services.fetchMentionedCards()),
+    takeEvery(EntryActionTypes.MEMBER_CARDS_FETCH, () => services.fetchMemberCards()),
     takeEvery(EntryActionTypes.CARDS_UPDATE_HANDLE, ({ payload: { cards, activities } }) =>
       services.handleCardsUpdate(cards, activities),
     ),

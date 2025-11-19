@@ -12,14 +12,18 @@ import selectors from '../../selectors';
 import { socket } from '../../api';
 import ActionTypes from '../../constants/ActionTypes';
 import Paths from '../../constants/Paths';
+import { log } from '../../utils/logger';
 
 export default function* coreSaga() {
+  log('coreSaga', 'starting');
   yield runWatchers(watchers);
 
   yield apply(socket, socket.connect);
   yield fork(services.initializeCore);
 
+  log('coreSaga', 'waiting for LOGOUT action');
   yield take(ActionTypes.LOGOUT);
+  log('coreSaga', 'LOGOUT action received, redirecting to login');
 
   const oidcBootstrap = yield select(selectors.selectOidcBootstrap);
 
@@ -28,10 +32,12 @@ export default function* coreSaga() {
 
     if (!currentUser || currentUser.isSsoUser) {
       // Redirect the user to the IDP to log out.
+      log('coreSaga', 'redirecting to OIDC endSessionUrl');
       window.location.href = oidcBootstrap.endSessionUrl;
       return;
     }
   }
 
+  log('coreSaga', 'redirecting to login page');
   window.location.href = Paths.LOGIN;
 }
